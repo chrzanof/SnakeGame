@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.snakegame.Controller">
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Arc?>
+<?import javafx.scene.shape.Box?>
+
+<VBox alignment="CENTER" prefHeight="390.0" prefWidth="381.0" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/18" fx:controller="com.example.snakegame.Controller">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
+    <Label fx:id="welcomeText" />
+   <AnchorPane prefHeight="200.0" prefWidth="200.0">
+      <children>
+         <Button layoutX="40.0" layoutY="43.0" mnemonicParsing="false" text="Button" />
+         <Button layoutX="241.0" layoutY="43.0" mnemonicParsing="false" text="Button" />
+         <Button layoutX="171.0" layoutY="122.0" mnemonicParsing="false" text="Button" />
+         <Box depth="100" height="100" layoutX="173.0" layoutY="68.0" width="100" />
+         <Arc fill="DODGERBLUE" layoutX="90.0" layoutY="185.0" length="270.0" radiusX="100.0" radiusY="100.0" startAngle="45.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
+      </children>
+   </AnchorPane>
+    <Button onAction="#onHelloButtonClick" text="Hello!" />
 </VBox>
