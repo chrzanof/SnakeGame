@@ -1,116 +1,170 @@
 package com.example.snakegame;
 
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Application extends javafx.application.Application {
-    Group root;
-    Scene scene;
-    Controller controller;
+    Stage window;
+    private Group root;
+    private Scene scene;
+    private Canvas canvas;
+    private GraphicsContext gc;
+    private Controller controller;
     private boolean isRunning = false;
-    public static List<Rectangle> snakeParts;
-
-    public List<Rectangle> draw() {
-       List<Rectangle> snakeParts = new ArrayList<>();
-        for (Block block : controller.snake.getBody()) {
-            Rectangle rec = new Rectangle();
-            rec.setFill(block.color);
-            rec.setX(block.getPositionX());
-            rec.setY(block.getPositionY());
-            rec.setHeight(controller.size);
-            rec.setWidth(controller.size);
-            snakeParts.add(rec);
-        }
-        return snakeParts;
-    }
+    Timeline timeline;
 
 
     @Override
     public void start(Stage stage) throws IOException {
-        //Parent root = FXMLLoader.load(getClass().getResource("hello-view.fxml"));
+        window = stage;
+        stage.setTitle("Snake");
+        controller = new Controller(new SnakeBody(), new Block());
+        initMenu(window);
+
+
+        window.show();
+    }
+    private void initMenu(Stage stage) {
+        StackPane pane = new StackPane();
+        pane.setPrefSize(controller.getWidth(),controller.getHeight());
+        Rectangle rectangle = new Rectangle(0,0,controller.getWidth(),controller.getHeight());
+        rectangle.setFill(Color.BLACK);
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        Button btn1 = new Button();
+        btn1.setText("New Game");
+        vBox.getChildren().add(btn1);
+        Button btn2 = new Button();
+        btn2.setText("High scores");
+        vBox.getChildren().add(btn2);
+        Button btn3 = new Button();
+        btn3.setText("Exit");
+        vBox.getChildren().add(btn3);
+        pane.getChildren().addAll(rectangle,vBox);
+        pane.setAlignment(Pos.CENTER);
+        Scene menuScene = new Scene(pane);
+        stage.setScene(menuScene);
+
+
+        btn1.setOnMouseClicked(e ->
+            startGame(window));
+        btn2.setOnMouseClicked(e -> initHighScores(window));
+        btn3.setOnMouseClicked(e -> window.close());
+    }
+    private void initHighScores(Stage stage) {
+
+    }
+    private void stopGame() {
+        isRunning = false;
+        timeline.stop();
+        controller.getSnake().getBody().clear();
+    }
+
+    private void stoppingGame() {
+        stopGame();
+        initGameOverScreen(window);
+    }
+
+    private void initGameOverScreen(Stage stage) {
+        StackPane pane = new StackPane();
+        pane.setPrefSize(controller.getWidth(),controller.getHeight());
+        Rectangle rectangle = new Rectangle(0,0,controller.getWidth(),controller.getHeight());
+        rectangle.setFill(Color.BLACK);
+        Text gameOverText = new Text("Game Over!");
+        gameOverText.setStroke(Color.RED);
+        Button exitBtn = new Button("Exit");
+        Button menuBtn = new Button("Main Manu");
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(gameOverText, menuBtn, exitBtn);
+        pane.getChildren().addAll(rectangle, vBox);
+        Scene gameOverScene = new Scene(pane);
+        pane.setAlignment(Pos.CENTER);
+        stage.setScene(gameOverScene);
+
+        exitBtn.setOnMouseClicked(e -> window.close());
+        menuBtn.setOnMouseClicked(e-> initMenu(window));
+
+    }
+
+    private void startGame(Stage stage) {
         root = new Group();
-        scene = new Scene(root, Color.BLACK);
-        Pane pane = new Pane();
-
-        Block snakeHead = new Block(controller.width/2-controller.size, controller.height/2- controller.size,Color.GREEN);
-        controller = new Controller(new SnakeBody(snakeHead), new Block());
-        stage.setWidth(controller.width);
-        stage.setHeight(controller.height);
-        stage.setResizable(true);
+        canvas = new Canvas(controller.getWidth(),controller.getHeight());
+        root.getChildren().add(canvas);
+        scene = new Scene(root);
+        stage.setResizable(false);
         stage.sizeToScene();
-        for (int j = 0; j < controller.height/controller.size; j++) {
-            Line lineV = new Line(j*controller.size,0,j*controller.size,controller.height);
-            lineV.setStroke(Color.WHITE);
-            Line lineH = new Line(0,j*controller.size,controller.width,j*controller.size);
-            lineH.setStroke(Color.WHITE);
-            root.getChildren().add(lineV);
-            root.getChildren().add(lineH);
-        }
-
-        stage.setTitle("Snake Game");
         stage.setScene(scene);
-
-
-        Timeline timeline = new Timeline();
+       // stage.show();
+        gc = canvas.getGraphicsContext2D();
+        controller.getSnake().add(new Block(controller.getWidth()/2 - controller.getSize(),controller.getHeight()/2 - controller.getSize(), Color.GREEN));
         controller.newRandomApplePosition();
-        isRunning = true;
+        controller.getSnake().getBody().get(0).setColor(Color.GREEN);
         controller.keyBindings(scene);
-        Rectangle apple = new Rectangle();
-        apple.setWidth(controller.size);
-        apple.setHeight(controller.size);
-        apple.setX(controller.apple.getPositionX() * controller.size);
-        apple.setY(controller.apple.getPositionY() * controller.size);
-        apple.setFill(controller.apple.color);
-        snakeParts = draw();
-        KeyFrame frame = new KeyFrame(Duration.seconds(0.2), actionEvent -> {
+        isRunning = true;
+        timeline = new Timeline(new KeyFrame(Duration.millis(150),actionEvent -> {
             if(!isRunning) {
-                System.out.println("zatrzymano");
+                stoppingGame();
                 return;
             }
+            stage.setTitle("Score - " + controller.getSnake().getNumberOfApplesEaten());
             controller.move();
-            controller.snake.setMoved(true);
-            int count = 0;
-            //snake draw
-            for (Rectangle part: snakeParts) {
-                part.setY(controller.snake.getBody().get(count).getPositionY());
-                part.setX(controller.snake.getBody().get(count).getPositionX());
-                count++;
-            }
-            //apple draw
-            apple.setX(controller.apple.getPositionX() * controller.size);
-            apple.setY(controller.apple.getPositionY() * controller.size);
-
+            controller.getSnake().setMoved(true);
             isRunning = controller.checkIsRunning();
-            boolean eaten = controller.checkIfAppleEaten();
-            if (eaten) {
-                Rectangle newPart = new Rectangle();
-                newPart.setY(controller.snake.getBody().get(controller.snake.getBody().size()-1).getPositionY());
-                newPart.setX(controller.snake.getBody().get(controller.snake.getBody().size()-1).getPositionX());
-                newPart.setFill(controller.snake.getBody().get(controller.snake.getBody().size()-1).getColor());
-                snakeParts.add(newPart);
-                root.getChildren().add(newPart);
-                System.out.println("dodano nowy element");
-            }
-        });
+            controller.checkIfAppleEaten();
+            draw();
 
-        timeline.getKeyFrames().addAll(frame);
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        root.getChildren().add(apple);
-        root.getChildren().addAll(snakeParts);
-        stage.show();
+        }));
+        timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+
+    }
+
+    private void draw() {
+        drawBackground();
+        drawApple();
+        drawSnake();
+    }
+
+    private void drawApple() {
+        gc.setFill(controller.getApple().getColor());
+        gc.fillOval(controller.getApple().getPositionX() * controller.getSize(), controller.getApple().getPositionY() * controller.getSize(), controller.getSize(), controller.getSize());
+    }
+
+    private void drawBackground() {
+        for (int i = 0; i < controller.getWidth()/controller.getSize(); i++) {
+            for (int j = 0; j < controller.getHeight()/controller.getSize(); j++) {
+                if((i+j) % 2 == 0)
+                    gc.setFill(Color.BLACK);
+                else
+                    gc.setFill(Color.rgb(30,30,30));
+                gc.fillRect(i * controller.getSize(), j * controller.getSize(),controller.getSize(), controller.getSize());
+            }
+        }
+    }
+
+    private void drawSnake() {
+        for (Block b :
+                controller.getSnake().getBody()) {
+            gc.setFill(b.getColor());
+            gc.fillRect(b.getPositionX(), b.getPositionY(), controller.getSize(), controller.getSize());
+
+        }
     }
 
     public static void main(String[] args) {

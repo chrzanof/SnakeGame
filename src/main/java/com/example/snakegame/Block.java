@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 public class Block {
     private int positionX;
     private int positionY;
-    Color color;
+    private Color color;
 
     public Block() {
     }
