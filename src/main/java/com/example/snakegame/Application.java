@@ -37,16 +37,38 @@ public class Application extends javafx.application.Application {
     public void start(Stage stage) throws IOException {
         window = stage;
         additionalWindow = new Stage();
-        stage.setTitle("Snake");
+        additionalWindow.setResizable(false);
+        additionalWindow.sizeToScene();
+        window.setTitle("Snake");
         controller = new Controller(new SnakeBody(), new Block());
         initMenu(window);
 
         window.show();
         System.out.println("Koniec funkcji start()");
     }
+    private  void initSave(Stage stage) {
+        StackPane pane = new StackPane();
+        pane.setPrefSize(200,200);
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        Button btn1 = new Button();
+        btn1.setText("Save");
+        TextField nameField = new TextField();
+        Label label = new Label("Name:");
+        label.setAlignment(Pos.CENTER);
+        vBox.getChildren().addAll(label,nameField,btn1);
+        pane.getChildren().addAll(vBox);
+        pane.setAlignment(Pos.CENTER);
+        Scene settingsScene = new Scene(pane);
+        stage.setScene(settingsScene);
+        stage.show();
+
+        btn1.setOnMouseClicked(mouseEvent -> {
+            controller.writeToCSV(nameField.getText());
+            stage.close();
+        });
+    }
     private void initSettings(Stage stage, String errorMsg) {
-        additionalWindow.setResizable(false);
-        additionalWindow.sizeToScene();
         StackPane pane = new StackPane();
         pane.setPrefSize(100,100);
         VBox vBox = new VBox();
@@ -82,6 +104,8 @@ public class Application extends javafx.application.Application {
 
     }
     private void initMenu(Stage stage) {
+        stage.setTitle("Snake");
+        controller.getSnake().setNumberOfApplesEaten(0);
         StackPane pane = new StackPane();
         pane.setPrefSize(Controller.DEFAULT_WIDTH,Controller.DEFAULT_HEIGHT);
         Rectangle rectangle = new Rectangle(0,0,Controller.DEFAULT_WIDTH,Controller.DEFAULT_HEIGHT);
@@ -129,10 +153,11 @@ public class Application extends javafx.application.Application {
         rectangle.setFill(Color.BLACK);
         Text gameOverText = new Text("Game Over!");
         gameOverText.setStroke(Color.RED);
+        Button saveBtn = new Button("Save Score");
         Button exitBtn = new Button("Exit");
         Button menuBtn = new Button("Main Manu");
         VBox vBox = new VBox();
-        vBox.getChildren().addAll(gameOverText, menuBtn, exitBtn);
+        vBox.getChildren().addAll(gameOverText, menuBtn,saveBtn, exitBtn);
         pane.getChildren().addAll(rectangle, vBox);
         Scene gameOverScene = new Scene(pane);
         pane.setAlignment(Pos.CENTER);
@@ -140,6 +165,7 @@ public class Application extends javafx.application.Application {
 
         exitBtn.setOnMouseClicked(e -> window.close());
         menuBtn.setOnMouseClicked(e-> initMenu(window));
+        saveBtn.setOnMouseClicked(e -> initSave(additionalWindow));
 
     }
 

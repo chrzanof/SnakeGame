@@ -6,6 +6,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class Controller {
@@ -35,6 +42,48 @@ public class Controller {
         this.columns = 24;
         this.width = size * rows;
         this.height = size * columns;
+    }
+
+    public void writeToCSV(String string) {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("save.csv");
+
+            writer.append(snake.getNumberOfApplesEaten() + "," + string);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                writer.close();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public List<List<String>> readFromCSV() {
+        List<List<String>> list = new ArrayList<>();
+        String line = "";
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader("save.csv"));
+            while ((line = reader.readLine()) != null) {
+                String[] row = line.split(",");
+                List<String> subList = Arrays.asList(row);
+                list.add(subList);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            return list;
+        }
     }
 
     public boolean checkIfAppleEaten() {
