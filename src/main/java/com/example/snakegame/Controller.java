@@ -218,14 +218,6 @@ public class Controller {
         return false;
     }
 
-    @FXML
-    private Label welcomeText;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
-
     public SnakeBody getSnake() {
         return snake;
     }
