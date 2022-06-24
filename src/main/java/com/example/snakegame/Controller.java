@@ -47,9 +47,9 @@ public class Controller {
     public void writeToCSV(String string) {
         FileWriter writer = null;
         try {
-            writer = new FileWriter("save.csv");
+            writer = new FileWriter("save.csv",true);
 
-            writer.append(snake.getNumberOfApplesEaten() + "," + string);
+            writer.append(snake.getNumberOfApplesEaten() + "," + string + "\n");
 
 
         } catch (IOException e) {

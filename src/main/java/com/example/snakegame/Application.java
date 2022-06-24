@@ -129,11 +129,28 @@ public class Application extends javafx.application.Application {
 
         btn1.setOnMouseClicked(e ->
             initSettings(additionalWindow, ""));
-        btn2.setOnMouseClicked(e -> initHighScores(window));
+        btn2.setOnMouseClicked(e -> initHighScores(additionalWindow));
         btn3.setOnMouseClicked(e -> window.close());
     }
     private void initHighScores(Stage stage) {
-
+        StackPane pane = new StackPane();
+        pane.setPrefSize(200,200);
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        List<List<String>> scores = controller.readFromCSV();
+        int count = 1;
+        for (List<String> score :
+                scores) {
+            Label scoreLabel = new Label( count + "." +score.get(1) + " " + score.get(0));
+            scoreLabel.setAlignment(Pos.CENTER);
+            vBox.getChildren().add(scoreLabel);
+            count++;
+        }
+        pane.getChildren().addAll(vBox);
+        pane.setAlignment(Pos.CENTER);
+        Scene settingsScene = new Scene(pane);
+        stage.setScene(settingsScene);
+        stage.show();
     }
     private void stopGame() {
         isRunning = false;
