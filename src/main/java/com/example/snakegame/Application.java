@@ -223,6 +223,7 @@ public class Application extends javafx.application.Application {
         controller.newRandomApplePosition();
         controller.getSnake().getBody().get(0).setColor(Color.GREEN);
         controller.keyBindings(scene);
+        controller.getSnake().setTimeInSeconds(0);
         isRunning = true;
          timer = new Thread(new Runnable() {
             @Override
@@ -230,7 +231,6 @@ public class Application extends javafx.application.Application {
                 while (isRunning) {
                     try {
                         controller.getSnake().setTimeInSeconds(controller.getSnake().getTimeInSeconds() + 1);
-                        System.out.println(controller.getSnake().getTimeInSeconds());
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
