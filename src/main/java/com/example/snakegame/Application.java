@@ -138,6 +138,14 @@ public class Application extends javafx.application.Application {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         List<List<String>> scores = controller.readFromCSV();
+        scores.sort((x, y) -> {
+            for (int i = 0; i < Math.min(x.size(), y.size()); i++) {
+                if (x.get(i) != y.get(i)) {
+                    return Integer.parseInt(y.get(i))  - Integer.parseInt(x.get(i));
+                }
+            }
+            return x.size() - y.size();
+        });
         int count = 1;
         for (List<String> score :
                 scores) {
