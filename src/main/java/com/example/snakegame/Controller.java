@@ -103,7 +103,7 @@ public class Controller {
 
     public String returnSnakeTimeInMinutesAndSeconds() {
         int seconds = snake.getTimeInSeconds();
-        int minutes = seconds/60;
+        int minutes = seconds / 60;
         seconds = seconds % 60;
         return minutes + "min" + seconds +"s";
     }

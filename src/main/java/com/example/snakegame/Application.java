@@ -24,20 +24,31 @@ import java.util.List;
 import java.util.Set;
 
 public class Application extends javafx.application.Application {
-    Stage window;
-    Stage additionalWindow;
+    private Stage window;
+    private Stage additionalWindow;
     private Group root;
     private Scene scene;
     private Canvas canvas;
     private GraphicsContext gc;
     private Controller controller;
     public static boolean isRunning = false;
-    Timeline timeline;
-    Thread timer;
-
+    private Timeline timeline;
+    private Thread timer;
+    private Button newGameBtn;
+    private Button highScoresBtn;
+    private Button exitBtn;
+    private Button saveBtn;
+    private Button mainMenuBtn;
+    private Button startGameBtn;
 
     @Override
     public void start(Stage stage) throws IOException {
+        newGameBtn = new Button("New Game");
+        highScoresBtn= new Button("High Scores");
+        exitBtn = new Button("Exit");
+        saveBtn = new Button("Save");
+        mainMenuBtn = new Button("Main menu");
+        startGameBtn = new Button("Start Game");
         window = stage;
         additionalWindow = new Stage();
         additionalWindow.setResizable(false);
@@ -45,28 +56,24 @@ public class Application extends javafx.application.Application {
         window.setTitle("Snake");
         controller = new Controller(new SnakeBody(), new Block());
         initMenu(window);
-
         window.show();
-
     }
     private  void initSave(Stage stage) {
         StackPane pane = new StackPane();
         pane.setPrefSize(200,200);
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
-        Button btn1 = new Button();
-        btn1.setText("Save");
         TextField nameField = new TextField();
         Label label = new Label("Name:");
         label.setAlignment(Pos.CENTER);
-        vBox.getChildren().addAll(label,nameField,btn1);
+        vBox.getChildren().addAll(label,nameField,saveBtn);
         pane.getChildren().addAll(vBox);
         pane.setAlignment(Pos.CENTER);
         Scene settingsScene = new Scene(pane);
         stage.setScene(settingsScene);
         stage.show();
 
-        btn1.setOnMouseClicked(mouseEvent -> {
+        saveBtn.setOnMouseClicked(mouseEvent -> {
             controller.writeToCSV(nameField.getText());
             stage.close();
         });
@@ -76,8 +83,6 @@ public class Application extends javafx.application.Application {
         pane.setPrefSize(100,100);
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
-        Button btn1 = new Button();
-        btn1.setText("Start Game");
         TextField rows = new TextField();
         Label label = new Label("x");
         label.setAlignment(Pos.CENTER);
@@ -86,13 +91,13 @@ public class Application extends javafx.application.Application {
         columns.setText("24");
         Label errorLabel = new Label(errorMsg);
         errorLabel.setTextFill(Color.RED);
-        vBox.getChildren().addAll(errorLabel,rows,label,columns,btn1);
+        vBox.getChildren().addAll(errorLabel,rows,label,columns,startGameBtn);
         pane.getChildren().addAll(vBox);
         pane.setAlignment(Pos.CENTER);
         Scene settingsScene = new Scene(pane);
         stage.setScene(settingsScene);
         stage.show();
-        btn1.setOnMouseClicked(e -> {
+        startGameBtn.setOnMouseClicked(e -> {
             try {
                 int rowNumber = Integer.parseInt(rows.getText());
                 int columnNumber = Integer.parseInt(columns.getText());
@@ -115,25 +120,17 @@ public class Application extends javafx.application.Application {
         rectangle.setFill(Color.BLACK);
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
-        Button btn1 = new Button();
-        btn1.setText("New Game");
-        vBox.getChildren().add(btn1);
-        Button btn2 = new Button();
-        btn2.setText("High scores");
-        vBox.getChildren().add(btn2);
-        Button btn3 = new Button();
-        btn3.setText("Exit");
-        vBox.getChildren().add(btn3);
+        vBox.getChildren().add(newGameBtn);
+        vBox.getChildren().add(highScoresBtn);
+        vBox.getChildren().add(exitBtn);
         pane.getChildren().addAll(rectangle,vBox);
         pane.setAlignment(Pos.CENTER);
         Scene menuScene = new Scene(pane);
         stage.setScene(menuScene);
-
-
-        btn1.setOnMouseClicked(e ->
+        newGameBtn.setOnMouseClicked(e ->
             initSettings(additionalWindow, ""));
-        btn2.setOnMouseClicked(e -> initHighScores(additionalWindow));
-        btn3.setOnMouseClicked(e -> window.close());
+        highScoresBtn.setOnMouseClicked(e -> initHighScores(additionalWindow));
+        exitBtn.setOnMouseClicked(e -> window.close());
     }
     private void initHighScores(Stage stage) {
         StackPane pane = new StackPane();
@@ -190,20 +187,15 @@ public class Application extends javafx.application.Application {
         gameOverText.setStroke(Color.RED);
         score.setStroke(Color.RED);
         time.setStroke(Color.RED);
-        Button saveBtn = new Button("Save Score");
-        Button exitBtn = new Button("Exit");
-        Button menuBtn = new Button("Main Manu");
         VBox vBox = new VBox();
-        vBox.getChildren().addAll(gameOverText,score,time,menuBtn,saveBtn, exitBtn);
+        vBox.getChildren().addAll(gameOverText,score,time,mainMenuBtn,saveBtn, exitBtn);
         pane.getChildren().addAll(rectangle, vBox);
         Scene gameOverScene = new Scene(pane);
         pane.setAlignment(Pos.CENTER);
         stage.setScene(gameOverScene);
-
         exitBtn.setOnMouseClicked(e -> window.close());
-        menuBtn.setOnMouseClicked(e-> initMenu(window));
+        mainMenuBtn.setOnMouseClicked(e-> initMenu(window));
         saveBtn.setOnMouseClicked(e -> initSave(additionalWindow));
-
     }
 
     private void startGame(Stage stage, int rows, int cols) {
