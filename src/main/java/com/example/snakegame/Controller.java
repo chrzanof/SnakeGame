@@ -9,15 +9,32 @@ import javafx.scene.paint.Color;
 import java.util.Random;
 
 public class Controller {
+    public static final int DEFAULT_WIDTH = 600;
+    public static final int DEFAULT_HEIGHT = 600;
     private SnakeBody snake;
     private Block apple;
-    private int size = 25;
-    private int width = size * 24;
-    private int height = size * 24;
+    private int size;
+    private int rows;
+    private int columns;
+    private int width;
+    private int height;
+
+    public Controller() {
+        this.size = 25;
+        this.rows = 24;
+        this.columns = 24;
+        this.width = size * rows;
+        this.height = size * columns;
+    }
 
     public Controller(SnakeBody snake, Block apple) {
+        this.size = 25;
         this.snake = snake;
         this.apple = apple;
+        this.rows = 24;
+        this.columns = 24;
+        this.width = size * rows;
+        this.height = size * columns;
     }
 
     public boolean checkIfAppleEaten() {
@@ -174,5 +191,24 @@ public class Controller {
 
     public void setDirection(Direction direction) {
         this.direction = direction;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public void setRows(int rows) {
+        this.rows = rows;
+        this.width = rows * this.size;
+    }
+
+    public int getColumns() {
+        return columns;
+
+    }
+
+    public void setColumns(int columns) {
+        this.columns = columns;
+        this.height = columns * this.size;
     }
 }

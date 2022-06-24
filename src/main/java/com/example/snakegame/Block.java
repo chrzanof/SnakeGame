@@ -3,7 +3,7 @@ package com.example.snakegame;
 import javafx.scene.paint.Color;
 
 public class Block {
-    private int positionX;
+    private int positionX ;
     private int positionY;
     private Color color;
 

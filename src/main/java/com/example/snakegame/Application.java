@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -21,6 +23,7 @@ import java.util.List;
 
 public class Application extends javafx.application.Application {
     Stage window;
+    Stage additionalWindow;
     private Group root;
     private Scene scene;
     private Canvas canvas;
@@ -33,17 +36,55 @@ public class Application extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws IOException {
         window = stage;
+        additionalWindow = new Stage();
         stage.setTitle("Snake");
         controller = new Controller(new SnakeBody(), new Block());
         initMenu(window);
 
-
         window.show();
+        System.out.println("Koniec funkcji start()");
+    }
+    private void initSettings(Stage stage, String errorMsg) {
+        additionalWindow.setResizable(false);
+        additionalWindow.sizeToScene();
+        StackPane pane = new StackPane();
+        pane.setPrefSize(100,100);
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        Button btn1 = new Button();
+        btn1.setText("Start Game");
+        TextField rows = new TextField();
+        Label label = new Label("x");
+        label.setAlignment(Pos.CENTER);
+        TextField columns = new TextField();
+        rows.setText("24");
+        columns.setText("24");
+        Label errorLabel = new Label(errorMsg);
+        errorLabel.setTextFill(Color.RED);
+        vBox.getChildren().addAll(errorLabel,rows,label,columns,btn1);
+        pane.getChildren().addAll(vBox);
+        pane.setAlignment(Pos.CENTER);
+        Scene settingsScene = new Scene(pane);
+        stage.setScene(settingsScene);
+        stage.show();
+        btn1.setOnMouseClicked(e -> {
+            try {
+                int rowNumber = Integer.parseInt(rows.getText());
+                int columnNumber = Integer.parseInt(columns.getText());
+                stage.close();
+                startGame(window, rowNumber, columnNumber);
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
+                stage.close();
+                initSettings(additionalWindow, "Wrong Input!");
+            }
+                });
+
     }
     private void initMenu(Stage stage) {
         StackPane pane = new StackPane();
-        pane.setPrefSize(controller.getWidth(),controller.getHeight());
-        Rectangle rectangle = new Rectangle(0,0,controller.getWidth(),controller.getHeight());
+        pane.setPrefSize(Controller.DEFAULT_WIDTH,Controller.DEFAULT_HEIGHT);
+        Rectangle rectangle = new Rectangle(0,0,Controller.DEFAULT_WIDTH,Controller.DEFAULT_HEIGHT);
         rectangle.setFill(Color.BLACK);
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
@@ -63,7 +104,7 @@ public class Application extends javafx.application.Application {
 
 
         btn1.setOnMouseClicked(e ->
-            startGame(window));
+            initSettings(additionalWindow, ""));
         btn2.setOnMouseClicked(e -> initHighScores(window));
         btn3.setOnMouseClicked(e -> window.close());
     }
@@ -83,8 +124,8 @@ public class Application extends javafx.application.Application {
 
     private void initGameOverScreen(Stage stage) {
         StackPane pane = new StackPane();
-        pane.setPrefSize(controller.getWidth(),controller.getHeight());
-        Rectangle rectangle = new Rectangle(0,0,controller.getWidth(),controller.getHeight());
+        pane.setPrefSize(Controller.DEFAULT_WIDTH,Controller.DEFAULT_HEIGHT);
+        Rectangle rectangle = new Rectangle(0,0,Controller.DEFAULT_WIDTH,Controller.DEFAULT_HEIGHT);
         rectangle.setFill(Color.BLACK);
         Text gameOverText = new Text("Game Over!");
         gameOverText.setStroke(Color.RED);
@@ -102,7 +143,9 @@ public class Application extends javafx.application.Application {
 
     }
 
-    private void startGame(Stage stage) {
+    private void startGame(Stage stage, int rows, int cols) {
+        controller.setRows(rows);
+        controller.setColumns(cols);
         root = new Group();
         canvas = new Canvas(controller.getWidth(),controller.getHeight());
         root.getChildren().add(canvas);
@@ -112,7 +155,8 @@ public class Application extends javafx.application.Application {
         stage.setScene(scene);
        // stage.show();
         gc = canvas.getGraphicsContext2D();
-        controller.getSnake().add(new Block(controller.getWidth()/2 - controller.getSize(),controller.getHeight()/2 - controller.getSize(), Color.GREEN));
+        controller.getSnake().add(new Block(controller.getRows()/2 *controller.getSize() - controller.getSize(),
+                controller.getColumns()/2 * controller.getSize() - controller.getSize(), Color.GREEN));
         controller.newRandomApplePosition();
         controller.getSnake().getBody().get(0).setColor(Color.GREEN);
         controller.keyBindings(scene);
@@ -128,11 +172,12 @@ public class Application extends javafx.application.Application {
             isRunning = controller.checkIsRunning();
             controller.checkIfAppleEaten();
             draw();
-
+            System.out.println("klatka w timeline");
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
 
+        System.out.println("koniec funkcji startGame()");
     }
 
     private void draw() {
