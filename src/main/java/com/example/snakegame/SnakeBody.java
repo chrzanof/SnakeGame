@@ -7,6 +7,7 @@ public class SnakeBody {
     private int numberOfApplesEaten;
     private List<Block> body;
     boolean moved;
+    private int timeInSeconds;
 
     public SnakeBody() {
         this.numberOfApplesEaten = 0;
@@ -19,6 +20,14 @@ public class SnakeBody {
         this.body = new ArrayList<>();
         this.body.add(head);
         this.moved = false;
+    }
+
+    public int getTimeInSeconds() {
+        return timeInSeconds;
+    }
+
+    public void setTimeInSeconds(int timeInSeconds) {
+        this.timeInSeconds = timeInSeconds;
     }
 
     public void add(Block block) {

@@ -31,8 +31,9 @@ public class Application extends javafx.application.Application {
     private Canvas canvas;
     private GraphicsContext gc;
     private Controller controller;
-    private boolean isRunning = false;
+    public static boolean isRunning = false;
     Timeline timeline;
+    Thread timer;
 
 
     @Override
@@ -46,7 +47,7 @@ public class Application extends javafx.application.Application {
         initMenu(window);
 
         window.show();
-        System.out.println("Koniec funkcji start()");
+
     }
     private  void initSave(Stage stage) {
         StackPane pane = new StackPane();
@@ -142,7 +143,7 @@ public class Application extends javafx.application.Application {
         List<List<String>> scores = controller.readFromCSV();
         scores.sort((x, y) -> {
             for (int i = 0; i < Math.min(x.size(), y.size()); i++) {
-                if (x.get(i) != y.get(i)) {
+                if (!x.get(i).equals(y.get(i))) {
                     if(i < 1)
                         return Integer.parseInt(y.get(i))  - Integer.parseInt(x.get(i));
                     else
@@ -168,6 +169,7 @@ public class Application extends javafx.application.Application {
     }
     private void stopGame() {
         isRunning = false;
+        timer.stop();
         timeline.stop();
         controller.getSnake().getBody().clear();
     }
@@ -183,12 +185,16 @@ public class Application extends javafx.application.Application {
         Rectangle rectangle = new Rectangle(0,0,Controller.DEFAULT_WIDTH,Controller.DEFAULT_HEIGHT);
         rectangle.setFill(Color.BLACK);
         Text gameOverText = new Text("Game Over!");
+        Text score = new Text("Your Score: " + controller.getSnake().getNumberOfApplesEaten());
+        Text time = new Text("Your Time: " + controller.returnSnakeTimeInMinutesAndSeconds());
         gameOverText.setStroke(Color.RED);
+        score.setStroke(Color.RED);
+        time.setStroke(Color.RED);
         Button saveBtn = new Button("Save Score");
         Button exitBtn = new Button("Exit");
         Button menuBtn = new Button("Main Manu");
         VBox vBox = new VBox();
-        vBox.getChildren().addAll(gameOverText, menuBtn,saveBtn, exitBtn);
+        vBox.getChildren().addAll(gameOverText,score,time,menuBtn,saveBtn, exitBtn);
         pane.getChildren().addAll(rectangle, vBox);
         Scene gameOverScene = new Scene(pane);
         pane.setAlignment(Pos.CENTER);
@@ -218,6 +224,20 @@ public class Application extends javafx.application.Application {
         controller.getSnake().getBody().get(0).setColor(Color.GREEN);
         controller.keyBindings(scene);
         isRunning = true;
+         timer = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isRunning) {
+                    try {
+                        controller.getSnake().setTimeInSeconds(controller.getSnake().getTimeInSeconds() + 1);
+                        System.out.println(controller.getSnake().getTimeInSeconds());
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
         timeline = new Timeline(new KeyFrame(Duration.millis(150),actionEvent -> {
             if(!isRunning) {
                 stoppingGame();
@@ -229,12 +249,10 @@ public class Application extends javafx.application.Application {
             isRunning = controller.checkIsRunning();
             controller.checkIfAppleEaten();
             draw();
-            System.out.println("klatka w timeline");
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
-
-        System.out.println("koniec funkcji startGame()");
+        timer.start();
     }
 
     private void draw() {

@@ -101,6 +101,13 @@ public class Controller {
         return false;
     }
 
+    public String returnSnakeTimeInMinutesAndSeconds() {
+        int seconds = snake.getTimeInSeconds();
+        int minutes = seconds/60;
+        seconds = seconds % 60;
+        return minutes + "min" + seconds +"s";
+    }
+
     public boolean checkIsRunning() {
         Block head = snake.getBody().get(0);
         if (head.getPositionX() >= width)
@@ -167,6 +174,11 @@ public class Controller {
                 case LEFT -> {
                     if (direction != Direction.RIGHT)
                         direction = Direction.LEFT;
+                }
+                case C -> {
+                    if (event.isControlDown()) {
+                        Application.isRunning = false;
+                    }
                 }
             }
 
