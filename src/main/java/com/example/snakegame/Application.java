@@ -19,7 +19,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Application extends javafx.application.Application {
     Stage window;
@@ -141,11 +143,15 @@ public class Application extends javafx.application.Application {
         scores.sort((x, y) -> {
             for (int i = 0; i < Math.min(x.size(), y.size()); i++) {
                 if (x.get(i) != y.get(i)) {
-                    return Integer.parseInt(y.get(i))  - Integer.parseInt(x.get(i));
+                    if(i < 1)
+                        return Integer.parseInt(y.get(i))  - Integer.parseInt(x.get(i));
+                    else
+                        return x.get(i).charAt(0)  - y.get(i).charAt(0);
                 }
             }
-            return x.size() - y.size();
+            return 0;
         });
+        scores = controller.removeNameDuplicatesInScoreList(scores);
         int count = 1;
         for (List<String> score :
                 scores) {

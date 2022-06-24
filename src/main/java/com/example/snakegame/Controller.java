@@ -121,6 +121,26 @@ public class Controller {
         return true;
     }
 
+    public List<List<String>> removeNameDuplicatesInScoreList(List<List<String>> list) {
+        List<List<String>> newList = new ArrayList<>();
+        for(List<String> ls : list) {
+            if(!listOfListsOfStringsContainsStringAtIndexOfSubList(newList, ls.get(1),1)){
+                newList.add(ls);
+            }
+        }
+        return newList;
+    }
+    public boolean listOfListsOfStringsContainsStringAtIndexOfSubList(List<List<String>> list,
+                                                                      String string,
+                                                                      int index) {
+        for (List<String> ls : list) {
+           if(ls.get(index).equals(string)) {
+               return true;
+           }
+        }
+        return false;
+    }
+
     public enum Direction {
         UP,DOWN,RIGHT,LEFT
     }
